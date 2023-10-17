@@ -1,5 +1,5 @@
 # ParcialDomiciliarioSPD
-![Tinkercad](./img/ArduinoTinkercad.jpg)
+![ArduinoTinkercad](https://github.com/BrendaCandy/ParcialDomiciliarioSPD/assets/138243185/3912db3a-098a-4a23-aabd-681c622abdc3)
 # Integrantes
 - Brenda Candy
 - Luciana Radimak
