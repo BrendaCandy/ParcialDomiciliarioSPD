@@ -6,53 +6,50 @@
 #define LED_E 7
 #define LED_F 11
 #define LED_G 10
-
 //DEFINE LOS PULSADORES
 #define BOTON_SUBE 4
 #define BOTON_BAJA 3
 #define BOTON_REINICIO 2
-
 //DEFINE CADA DISPLAY
 #define UNIDAD A4
 #define DECENA A5
-
 //DEFINE EL ESTADO APAGADO PARA LOS DISPLAYS
 #define APAGADOS 0
-
 // DEFINO LA VARIABLE DIA
 #define DIA 188
 //DEFINE EL TIEMPO QUE SE VA A MANTENER PRENDIDO UN DISPLAY
 #define TIMEDISPLAYON 10
-
 //DEFINE EL SWITCH
 #define SWITCH 9
-
-//DEFINE EL EL MOTOR
+//DEFINE EL MOTOR
 #define MOTOR 8
-
 //DEFINO EL SENSOR
 #define SENSOR A0
+//DEFINO TEMPERATURAS
+#define TEMPERATURAMINIMA 60
+#define TEMPERATURAMAXIMA 90
 //DEFINO LA FOTORESISTENCIA
 #define FOTORESISTENCIA A1
-//variables para el control de la temperatura
-int lecturaSensor;
+//variable para el control de la fotoresistencia
 int lecturaFotoresistencia;
+//variables para el control de la temperatura
 int temperatura;
-int TEMPERATURAMINIMA = 60;
-int TEMPERATURAMAXIMA = 90;
-//El contador define qué número se va a mostrar en los displays
+int lecturaSensor;
+//variable que define qué número se va a mostrar en los displays
 int contador = 0;
-//variables para controlar los pulsadores
+//variables para verificar el estado de los pulsadores
 int sube = 1;
 int anteriorSube = 1;
 int baja = 1;
 int anteriorBaja = 1;
 int reinicio = 1;
 int anteriorReinicio = 1;
+//variable para el verificar si el sensor fue presionado
 int estadoSwitchPrevia = 1;
 
 void setup()
 { 
+  // Al ser declarado input_pullup devuelve 0 SI SE PRESIONÓ, 1 SI NO SE PRESIONÓ
   pinMode(BOTON_SUBE, INPUT_PULLUP);
   pinMode(BOTON_BAJA, INPUT_PULLUP);
   pinMode(BOTON_REINICIO, INPUT_PULLUP);
@@ -67,22 +64,17 @@ void setup()
   pinMode(LED_E, OUTPUT);
   pinMode(LED_F, OUTPUT);
   pinMode(LED_G, OUTPUT);
-
-  //INICIALIZO LOS DISPLAYS EN ESTADO APAGADO
-   prendeDisplay(APAGADOS);
-  Serial.begin(9600);
 }
 
 void loop()
 { 
-  lecturaFotoresistencia = analogRead(FOTORESISTENCIA);
-  Serial.println(lecturaFotoresistencia);
+  lecturaFotoresistencia = analogRead(FOTORESISTENCIA);//Lectura de la fotoresistencia
   lecturaSensor = analogRead(SENSOR); //Lectura del sensor de temperatura
   
-  if (controlarMotor(lecturaSensor) || lecturaFotoresistencia > DIA )// Si el motor está encendido se encienden los displays y se habilita su funcionamiento
+  if (controlarMotor(lecturaSensor) || lecturaFotoresistencia > DIA )// Si el motor está encendido o es de dia se encienden los displays y se habilita su funcionamiento
   {
-  	int estadoSwitch = digitalRead(SWITCH);
-  	int botonPresionado = estadoBoton();
+  	int estadoSwitch = digitalRead(SWITCH);//Lectura de el switch
+  	int botonPresionado = estadoBoton();//Lectura de los botones
     
     if (botonPresionado == BOTON_REINICIO)
     {
@@ -90,14 +82,13 @@ void loop()
     }
     else if (!controlarInterruptor(estadoSwitch))
     {
-      //Si el interruptor cambio su estado , resetear el contador a 0
-      interruptorApagado(botonPresionado);
+      interruptorApagado(botonPresionado);//Si el switch se encuentra apagado se mostraran numeroes enteros positivos
     }
     else
     {
-      interruptorEncendido(botonPresionado);
+      interruptorEncendido(botonPresionado);//Si el switch se encuentra encendido se mostraran los numeros primos
     }
-    mostrarContador(contador);
+    mostrarContador(contador);//Muestra en cada display el numero correspondiente
   }  
   else
   {
@@ -105,16 +96,17 @@ void loop()
   }
 }
 
+
 bool controlarInterruptor(int estadoSwitch)
-{  
-  bool prendido = false;
+{  //Esta funcion se encarga  de controlas los estados  de switch
+  bool prendido = false;//esta variable se encargara de seuir el estado del switch
   
-  if(estadoSwitch == 0)
+  if(estadoSwitch == 0)//si se  encuentra encendido
   {
      prendido = true;
   }
 
-  if(estadoSwitch == !estadoSwitchPrevia)
+  if(estadoSwitch == !estadoSwitchPrevia)//si se presiono 
   {
     estadoSwitchPrevia = estadoSwitch;
     contador = 0;// Reiniciar el contador si el interruptor cambió
@@ -122,7 +114,7 @@ bool controlarInterruptor(int estadoSwitch)
   return prendido;
 }
 bool controlarMotor(int lecturaSensor)
-{
+{//Esta funcion controla el estado del motor
   bool estadoDelMotor;
   temperatura = map(lecturaSensor, 20, 358, -40, 125);
   //Verificar si la temperatura está dentro del rango requerido
@@ -159,9 +151,8 @@ void interruptorApagado(int botonPresionado)
 void interruptorEncendido(int botonPresionado)
 //Funcion que maneja los contadores en numeros primos
 {
-	if (botonPresionado == BOTON_SUBE)
+	if (botonPresionado == BOTON_SUBE)//Incrementa el contador al encontrar numero primo
     {
-      //Incrementa el contador al encontrar numero primo
       contador += 1;
       for (contador; ;contador++)
       {
@@ -193,27 +184,27 @@ void interruptorEncendido(int botonPresionado)
       }
 }
 void prendeDisplay (int digito)
-{
-	if (digito == UNIDAD)
+{//Esta funcion se encarga de encender los display para mostrar los contadores
+	if (digito == UNIDAD)//Enciende solo la unidad
     {
       digitalWrite(UNIDAD, LOW);
       digitalWrite(DECENA, HIGH);
       delay(TIMEDISPLAYON);
     }
-    else if (digito == DECENA)
+    else if (digito == DECENA)//Enciende solo la decena
     {
       digitalWrite(UNIDAD, HIGH);
       digitalWrite(DECENA, LOW);
       delay(TIMEDISPLAYON);
     }
-  	else
+  	else//Si no es ninguna de las dos anteriores apagar ambos displays
     {
       digitalWrite(UNIDAD, HIGH);
       digitalWrite(DECENA, HIGH);
     }
 }
 void mostrarContador (int contador)
-{
+{//Esta funcion se encarga de mostrar los contadores
     //APAGO LOS DISPLAYS PARA TENER CONTROL DE CADA UNO
 	prendeDisplay(APAGADOS);
     //PRIMERO DIBUJO LAS DECENAS
@@ -229,10 +220,9 @@ void mostrarContador (int contador)
 }
     
 int estadoBoton()
-{
-    /*Esta funcion devuelve el boton que fue presionado o 0 
+{	/*Esta funcion devuelve el boton que fue presionado o 0 
     en el caso de que ninguno haya sido presionado*/
-	sube = digitalRead(BOTON_SUBE);// Al ser declarado input_pullup devuelve 0 SI SE PRESIONÓ, 1 SI NO SE PRESIONÓ
+	sube = digitalRead(BOTON_SUBE);
 	baja = digitalRead(BOTON_BAJA);
     reinicio = digitalRead(BOTON_REINICIO);
     // COMPRUEBO SI LOS PULSADORES ESTÁN SIN PRESIONAR
@@ -298,7 +288,7 @@ void mostrarNumero(int numero)
     }
 }
 void configurarDisplay(int a, int b, int c, int d, int e, int f, int g)
-{
+{//Esta funcion configura los displays dependiendo de lo que se le pase por parametro
   digitalWrite(LED_A,a);
   digitalWrite(LED_B,b);
   digitalWrite(LED_C,c);
@@ -310,18 +300,18 @@ void configurarDisplay(int a, int b, int c, int d, int e, int f, int g)
 
 bool esPrimo(int numero)
 {
- /*Esta funcion devuelve TRUE si un numero es primo y FALSE si no lo es*/
+ /*Esta funcion se encarga de detectar numeros primos. Devuelve TRUE si un numero es primo y FALSE si no lo es*/
   bool esPrimo = true;
   if (numero < 2)
   {
     esPrimo = false; // Los números negativos y 1 no son primos
   }
 
-  for (int i = 2; i <= sqrt(numero); i++)
+  for (int i = 2; i <= sqrt(numero); i++)//Itera desde 2 hasta la raíz cuadrada del número
   {
-    if (numero % i == 0)
+    if (numero % i == 0)//Si el número es divisible por algún valor en ese rango, no es primo
     {
-      esPrimo = false; // El número es divisible por i, no es primo
+      esPrimo = false; 
     }
   }
   return esPrimo; 
