@@ -19,6 +19,8 @@
 //DEFINE EL ESTADO APAGADO PARA LOS DISPLAYS
 #define APAGADOS 0
 
+// DEFINO LA VARIABLE DIA
+#define DIA 188
 //DEFINE EL TIEMPO QUE SE VA A MANTENER PRENDIDO UN DISPLAY
 #define TIMEDISPLAYON 10
 
@@ -30,9 +32,11 @@
 
 //DEFINO EL SENSOR
 #define SENSOR A0
-
+//DEFINO LA FOTORESISTENCIA
+#define FOTORESISTENCIA A1
 //variables para el control de la temperatura
 int lecturaSensor;
+int lecturaFotoresistencia;
 int temperatura;
 int TEMPERATURAMINIMA = 60;
 int TEMPERATURAMAXIMA = 90;
@@ -66,14 +70,16 @@ void setup()
 
   //INICIALIZO LOS DISPLAYS EN ESTADO APAGADO
    prendeDisplay(APAGADOS);
+  Serial.begin(9600);
 }
 
 void loop()
 { 
-  //Lectura del sensor de temperatura
-  lecturaSensor = analogRead(SENSOR); 
+  lecturaFotoresistencia = analogRead(FOTORESISTENCIA);
+  Serial.println(lecturaFotoresistencia);
+  lecturaSensor = analogRead(SENSOR); //Lectura del sensor de temperatura
   
-  if (controlarMotor(lecturaSensor))// Si el motor está encendido se encienden los displays y se habilita su funcionamiento
+  if (controlarMotor(lecturaSensor) || lecturaFotoresistencia > DIA )// Si el motor está encendido se encienden los displays y se habilita su funcionamiento
   {
   	int estadoSwitch = digitalRead(SWITCH);
   	int botonPresionado = estadoBoton();
