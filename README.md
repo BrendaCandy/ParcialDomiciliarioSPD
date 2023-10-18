@@ -47,4 +47,5 @@ Es un componente cuya resistencia eléctrica varía en función de la intensidad
 En condiciones de oscuridad, la fotoresistencia tiene una resistencia alta, lo que significa que permite pasar muy poca corriente eléctrica. A medida que la luz incide sobre la fotoresistencia, la resistencia disminuye, permitiendo que pase más corriente eléctrica a través de ella. 
 En este proyecto la aplicamos para que el correcto funcionamiento de los contadores se de cuando halla buena iluminacion. En caso de que nos de la iluminacion necesaria permitira 
 la visualizacion de los contadores.
+## :robot: Link al proyecto
 - [proyecto](https://www.tinkercad.com/things/8YnSWzFuR6l?sharecode=zWcwQIw50gMu8HispR4PdkUBU1Z2434c62Z-CY3R1Ws)
